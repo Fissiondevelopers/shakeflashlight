@@ -14,6 +14,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity  {
             }
         } catch (CameraAccessException e) {
             e.printStackTrace();
-            Toast.makeText(MainActivity.this,"Exception raised",Toast.LENGTH_SHORT)
+            Toast.makeText(MainActivity.this,"Exception raised",Toast.LENGTH_SHORT).show();
         }
 
 

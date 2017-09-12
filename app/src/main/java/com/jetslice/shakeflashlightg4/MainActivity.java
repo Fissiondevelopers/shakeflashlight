@@ -1,20 +1,16 @@
 package com.jetslice.shakeflashlightg4;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
+
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,10 +18,12 @@ import android.widget.Toast;
 
 import java.security.Policy;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private ShakeDetector mShakeDetector;
+    private CameraManager manager;
+    private boolean isFlashOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,53 +44,74 @@ public class MainActivity extends AppCompatActivity  {
 				 * method you would use to setup whatever you want done once the
 				 * device has been shook.**/
 
-
-                    flashLightOff(4);
-
-                try {
-                    flashlighton(2);
-                } catch (CameraAccessException e) {
-                    e.printStackTrace();
+                if(count==4){
+                    try {
+                        flashlighton(false);
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
+                if(count==2) {
+                    try {
+                        flashlighton(true);
 
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
 
             }
         });
 
 
-
-
     }
+
+
     @Override
     public void onResume() {
         super.onResume();
         // Add the following line to register the Session Manager Listener onResume
-        mSensorManager.registerListener(mShakeDetector, mAccelerometer,	SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(mShakeDetector, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
     public void onPause() {
+        super.onPause();
+
         // Add the following line to unregister the Sensor Manager onPause
         mSensorManager.unregisterListener(mShakeDetector);
-        super.onPause();
-    }
-    private void handleshakeevent(int co){
-        Toast.makeText(MainActivity.this,"Shake detected",Toast.LENGTH_SHORT).show();
-    }
-    private void flashlighton(int c) throws CameraAccessException {
+        // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+
+
+
+    private void flashlighton(boolean toggle) throws CameraAccessException {
+        Toast.makeText(MainActivity.this,"Flash On",Toast.LENGTH_SHORT).show();
         CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         String cameraId = null; // Usually front camera is at 0 position.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             cameraId = camManager.getCameraIdList()[0];
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            camManager.setTorchMode(cameraId, true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
+
+                camManager.setTorchMode(cameraId, toggle);
+
+
         }
 
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void flashLightOff(int c){
+    public void flashLightOff(int c){
+        Toast.makeText(MainActivity.this,"flash off",Toast.LENGTH_SHORT).show();
         CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
         String cameraId = null; // Usually ront camera is at 0 position.
@@ -103,6 +122,7 @@ public class MainActivity extends AppCompatActivity  {
             }
         } catch (CameraAccessException e) {
             e.printStackTrace();
+            Log.d("MainActivity","Camerid not fetching");
 
         }
 
